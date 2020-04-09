@@ -173,6 +173,6 @@ app.put('/editstore', (req, res) => {
 
 
 
-app.listen(3001, () => {
-    console.log("app is listening on port 3001")
+app.listen(env.process.PORT, () => {
+    console.log(`app is listening on port ${env.process.PORT}`)
 })
