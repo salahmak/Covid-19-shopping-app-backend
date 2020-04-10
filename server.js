@@ -138,7 +138,7 @@ app.post('/deletestore', (req, res) => {
     const dbStore = database.collection('stores')
     dbStore.doc(id).delete()
         .then(() => {
-            database.collection('stores').doc(id).get()
+            database.collection('stores').get()
                 .then(snapshot => {
                     snapshot.forEach(doc => newStores.push(doc.data()))
                     res.json(newStores)
