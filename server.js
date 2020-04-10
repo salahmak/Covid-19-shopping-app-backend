@@ -134,10 +134,18 @@ app.get('/getstores', (req, res) => {
 
 app.delete('/deletestore', (req, res) => {
     const { id } = req.body;
+    let newStores = []
     const dbStore = database.collection('stores')
     dbStore.doc(id).delete()
         .then(() => {
-            res.json('store deleted successfully')
+            database.collection('stores').doc(id).get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => newStores.push(doc.data()))
+                    res.json(newStores)
+                })
+                .catch(err => {
+                    res.status(400).json("error deleting store")
+                })
         })
         .catch(err => {
             res.status(400).json('error deleting the store', err.message)
