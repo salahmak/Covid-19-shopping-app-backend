@@ -132,8 +132,8 @@ app.get('/getstores', (req, res) => {
 })
 
 
-app.delete('/deletestore', (req, res) => {
-    const id = req.body;
+app.post('/deletestore', (req, res) => {
+    const { id } = req.body;
     let newStores = []
     const dbStore = database.collection('stores')
     dbStore.doc(id).delete()
