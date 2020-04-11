@@ -39,58 +39,70 @@ app.get('/', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-    firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
-        .then((user) => {
-            if (user) {
-                let user = firebase.auth().currentUser
-                user.updateProfile({
-                    displayName: req.body.name,
-                }).then(() => {
-                    const newUser = {
-                        id: uuidv1(),
-                        name: user.displayName,
-                        email: user.email
-                    }
-                    res.json(newUser);
-                    database.collection('users').doc(user.uid).set(newUser)
-                })
-                    .catch(err => {
-                        res.status(400).json('error while signing')
+    const { email, password, name } = req.body
+    if (!email && !password && !name) {
+        return res.status(400).json('Please fill the required inputs before clicking register!')
+    } else {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((user) => {
+                if (user) {
+                    let user = firebase.auth().currentUser
+                    user.updateProfile({
+                        displayName: name,
+                    }).then(() => {
+                        const newUser = {
+                            id: uuidv1(),
+                            name: user.displayName,
+                            email: user.email
+                        }
+                        res.json(newUser);
+                        database.collection('users').doc(user.uid).set(newUser)
                     })
-            } else {
-                res.status(400).json('error')
-            }
-        })
-        .catch(err => {
-            res.status(400).json(err.message)
-        })
+                        .catch(err => {
+                            res.status(400).json('error while signing')
+                        })
+                } else {
+                    res.status(400).json('error')
+                }
+            })
+            .catch(err => {
+                res.status(400).json(err.message)
+            })
+    }
+
 })
 
 
 app.post('/login', (req, res) => {
-    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
-        .then(user => {
-            if (user) {
-                let dbUser = {}
-                let user = firebase.auth().currentUser
-                database.collection('users').doc(user.uid).get().then(doc => {
-                    const userLogin = {
-                        id: doc.data().id,
-                        name: user.displayName,
-                        email: user.email
-                    }
-                    res.json(userLogin)
-                }).catch(err => {
-                    res.status(400).json("could not login")
-                })
+    const { email, password } = req.body
+    if (!email && !password) {
+        return res.status(400).json('Please fill the required inputs before logging in!')
+    } else {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(user => {
+                if (user) {
+                    let dbUser = {}
+                    let user = firebase.auth().currentUser
+                    database.collection('users').doc(user.uid).get().then(doc => {
+                        const userLogin = {
+                            id: doc.data().id,
+                            name: user.displayName,
+                            email: user.email
+                        }
+                        res.json(userLogin)
+                    }).catch(err => {
+                        res.status(400).json("could not login")
+                    })
 
-            } else {
-                res.status(400).json('An error has occured while signing in')
-            }
-        })
-        .catch(err => {
-            res.json(err.message)
-        })
+                } else {
+                    res.status(400).json('An error has occured while signing in')
+                }
+            })
+            .catch(err => {
+                res.json(err.message)
+            })
+    }
+
 })
 
 app.post('/newstore', (req, res) => {
