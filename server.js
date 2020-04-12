@@ -56,7 +56,7 @@ app.post('/register', (req, res) => {
                             email: user.email
                         }
                         res.json(newUser);
-                        database.collection('users').doc(user.uid).set(newUser)
+                        database.collection('users').doc(newUser.uid).set(newUser)
                     })
                         .catch(err => {
                             res.status(400).json('error while signing')
