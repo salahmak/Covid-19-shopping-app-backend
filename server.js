@@ -189,7 +189,7 @@ app.get('/user/:id', (req, res) => {
     database.collection('users').doc(id).get()
         .then(user => {
             if (user) {
-                res.json(user)
+                res.json(user.data())
             } else {
                 res.status(400).json('User does not exist')
             }
