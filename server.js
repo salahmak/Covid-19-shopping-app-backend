@@ -184,6 +184,21 @@ app.put('/editstore', (req, res) => {
 })
 
 
+app.get('/user/:id', (req, res) => {
+    const { id } = req.params;
+    database.collection('users').doc(id).get()
+        .then(user => {
+            if (user) {
+                res.json(user)
+            } else {
+                res.status(400).json('User does not exist')
+            }
+        })
+        .catch(err => {
+            res.status(400).json('error getting user please login again')
+        })
+})
+
 
 
 
