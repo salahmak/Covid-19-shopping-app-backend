@@ -56,20 +56,19 @@ app.post('/register', (req, res) => {
                             email: user.email
                         }
                         res.json(newUser);
-                        database.collection('users').doc(newUser.id).set(newUser)
+                        database.collection('users').doc(user.uid).set(newUser)
                     })
                         .catch(err => {
-                            res.status(400).json('error while signing')
+                            res.status(400).json('error while signing up')
                         })
                 } else {
-                    res.status(400).json('error')
+                    res.status(400).json('the server has sent an error back')
                 }
             })
             .catch(err => {
                 res.status(400).json(err.message)
             })
     }
-
 })
 
 
