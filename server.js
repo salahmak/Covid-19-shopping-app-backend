@@ -3,7 +3,6 @@ var firebase = require("firebase")
 const cors = require('cors');
 const bodyParser = require('body-parser');
 var admin = require("firebase-admin");
-const uuidv1 = require('uuid/v1');
 
 var serviceAccount = require("./double-gamma-272520-firebase-adminsdk-9v88v-7689ac4fc0.json");
 
