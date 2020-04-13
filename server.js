@@ -51,7 +51,7 @@ app.post('/register', (req, res) => {
                         displayName: name,
                     }).then(() => {
                         const newUser = {
-                            id: uuidv1(),
+                            id: user.uid,
                             name: user.displayName,
                             email: user.email
                         }
@@ -84,7 +84,7 @@ app.post('/login', (req, res) => {
                     let user = firebase.auth().currentUser
                     database.collection('users').doc(user.uid).get().then(doc => {
                         const userLogin = {
-                            id: doc.data().id,
+                            id: user.uid,
                             name: user.displayName,
                             email: user.email
                         }
