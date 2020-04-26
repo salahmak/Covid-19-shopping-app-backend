@@ -3,23 +3,24 @@ var firebase = require("firebase")
 const cors = require('cors');
 const bodyParser = require('body-parser');
 var admin = require("firebase-admin");
+const port = process.env.PORT;
 
-var serviceAccount = require("./double-gamma-272520-firebase-adminsdk-9v88v-7689ac4fc0.json");
+var serviceAccount = require("my firebase admin file.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://double-gamma-272520.firebaseio.com"
+    databaseURL: "xxxxxxxxxxxxxxxxxxxx"
 });
 
 firebase.initializeApp({
-    apiKey: "AIzaSyDRvYpK6ySVnY1WbKQlrsmO1Oy6pEHq_co",
-    authDomain: "double-gamma-272520.firebaseapp.com",
-    databaseURL: "https://double-gamma-272520.firebaseio.com",
-    projectId: "double-gamma-272520",
-    storageBucket: "double-gamma-272520.appspot.com",
-    messagingSenderId: "808633636014",
-    appId: "1:808633636014:web:1f4b187b3e0546d551093f",
-    measurementId: "G-XSN0D376E0"
+    apiKey: "xxxxxxxxxx",
+    authDomain: "xxxxxxxxxx",
+    databaseURL: "xxxxxxxxxxxxxxxx",
+    projectId: "xxxxxxxxxxx",
+    storageBucket: "xxxxxxxxxx",
+    messagingSenderId: "xxxxxxxxxxxxx",
+    appId: "xxxxxxxxxxx",
+    measurementId: "xxxxxxxxxx"
 })
 
 
@@ -38,8 +39,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-    const { email, password, name } = req.body
-    if (!email && !password && !name) {
+    const { email, password, name, type } = req.body
+    if (!email && !password && !name && !type) {
         return res.status(400).json('Please fill the required inputs before clicking register!')
     } else {
         firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -49,10 +50,14 @@ app.post('/register', (req, res) => {
                     user.updateProfile({
                         displayName: name,
                     }).then(() => {
+
                         const newUser = {
                             id: user.uid,
                             name: user.displayName,
-                            email: user.email
+                            email: user.email,
+                            type,
+                            pic: "https://www.kindpng.com/picc/b/495/4952535.png",
+                            joined: user.metadata.creationTime
                         }
                         res.json(newUser);
                         database.collection('users').doc(user.uid).set(newUser)
@@ -79,13 +84,15 @@ app.post('/login', (req, res) => {
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then(user => {
                 if (user) {
-                    let dbUser = {}
                     let user = firebase.auth().currentUser
                     database.collection('users').doc(user.uid).get().then(doc => {
                         const userLogin = {
                             id: user.uid,
                             name: user.displayName,
-                            email: user.email
+                            email: user.email,
+                            type: doc.data().type,
+                            pic: doc.data().pic,
+                            joined: doc.data().joined
                         }
                         res.json(userLogin)
                     }).catch(err => {
@@ -197,15 +204,46 @@ app.get('/user/:id', (req, res) => {
         })
 })
 
+app.put('/newpassword', (req, res) => {
+    const { email, password, newPassword } = req.body;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(user => {
+            if (user) {
+                let user = firebase.auth().currentUser
+                user.updatePassword(newPassword).then(() => {
+                    res.json("success")
+                }).catch(() => {
+                    res.status(400).json("An error has occured while updating the password")
+                });
+            } else {
+                res.status('400').json("error")
+            }
+        })
+        .catch(() => {
+            res.status(400).json("Please verify your current password then continue")
+        })
+})
+
+
+app.put('/newpicture', (req, res) => {
+    const { id, name, email, type, joined, pic } = req.body;
+    const updatedUser = { id, name, email, type, joined, pic }
+
+    database.collection('users').doc(id).set(updatedUser)
+        .then(() => {
+            res.json(updatedUser)
+        })
+        .catch((err) => {
+            res.status(400).json('an error has occured while updating the profile picture')
+        })
+})
 
 
 
-///////// get stores:
-/* 
-*/
 
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`app is listening on port ${process.env.PORT}`)
+app.listen(port, () => {
+    console.log(`app is listening on port ${port}`)
 })
