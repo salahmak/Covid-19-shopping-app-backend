@@ -16,7 +16,7 @@
     "express": "^4.17.1",
     "firebase": "^7.14.2",
     "firebase-admin": "^8.11.0",
-    "nodemon": "^2.0.3",
+    "nodemon": "^2.0.20",
     "uuid": "^3.4.0"
   }
 }
